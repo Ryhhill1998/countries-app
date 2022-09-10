@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.scss";
 
 const App = () => {
-  // const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [countryArea, setCountryArea] = useState([]);
   const [countryCapital, setCountryCapital] = useState([]);
   const [countryFlag, setCountryFlag] = useState([]);
@@ -10,20 +10,17 @@ const App = () => {
 
   const url = "https://restcountries.com/v3.1/name";
   const url2 = "https://countryflagsapi.com/png";
-  const query = "spain";
 
   const backgroundImg = `${process.env.PUBLIC_URL}/images/image.png`;
 
   useEffect(() => {
-    getCountryData(query);
-    getCountryFlag(query);
-  }, []);
+    getCountryData(searchQuery);
+    getCountryFlag(searchQuery);
+  }, [searchQuery]);
 
   const getCountryData = async (country) => {
-    if (!query) return;
     const response = await fetch(`${url}/${country}`);
     const [data] = await response.json();
-    console.log(data);
     const { area, capital, population } = data;
     setCountryArea(area);
     setCountryCapital(capital);
@@ -33,6 +30,11 @@ const App = () => {
   const getCountryFlag = async (country) => {
     const response = await fetch(`${url2}/${country}`);
     setCountryFlag(response.url);
+  };
+
+  const onSearchChange = (event) => {
+    const searchQueryString = event.target.value.toLowerCase();
+    setSearchQuery(searchQueryString);
   };
 
   return (
@@ -47,13 +49,16 @@ const App = () => {
         className="search-countries"
         type="search"
         placeholder="Search countries"
+        onChange={onSearchChange}
       ></input>
       <div className="country-container">
-        <div className="flag-img-container">
-          <img className="flag-img" src={countryFlag} alt={`${query} flag`} />
-        </div>
+        <img
+          className="flag-img"
+          src={countryFlag}
+          alt={`${searchQuery} flag`}
+        />
         <div className="country-details-container">
-          <h2>Country: {query}</h2>
+          <h2>Country: {searchQuery}</h2>
           <h2>Capital: {countryCapital}</h2>
           <h2>Population: {countryPopulation}</h2>
           <h2>Area: {countryArea} km²</h2>
