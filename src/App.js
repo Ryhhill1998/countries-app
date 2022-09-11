@@ -59,6 +59,7 @@ const App = () => {
         throw new Error(`Error: ${response.status} flag not found`);
       }
       setCountryFlag(response.url);
+      setCountryVisible(true);
     } catch (err) {
       alert(err.message);
     }
@@ -72,7 +73,6 @@ const App = () => {
     }
     getCountryData(searchQuery);
     getCountryFlag(searchQuery);
-    setCountryVisible(true);
   };
 
   const onSearchChange = (event) => {
