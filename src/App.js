@@ -1,38 +1,78 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.scss";
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [allCountries, setAllCountries] = useState([]);
   const [countryVisible, setCountryVisible] = useState(false);
   const [countryArea, setCountryArea] = useState([]);
   const [countryCapital, setCountryCapital] = useState([]);
   const [countryFlag, setCountryFlag] = useState([]);
   const [countryPopulation, setCountryPopulation] = useState([]);
 
-  const url = "https://restcountries.com/v3.1/name";
-  const url2 = "https://countryflagsapi.com/png";
+  const urlAll = "https://restcountries.com/v3.1/all";
+  const urlName = "https://restcountries.com/v3.1/name";
+  const urlFlag = "https://countryflagsapi.com/png";
 
   const backgroundImg = `${process.env.PUBLIC_URL}/images/image.png`;
 
+  useEffect(() => {
+    getAllCountries();
+  });
+
+  const getAllCountries = async () => {
+    try {
+      const response = await fetch(urlAll);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} country data not found`);
+      }
+      const data = await response.json();
+      const countries = data.map((country) =>
+        country.name.common.toLowerCase()
+      );
+      setAllCountries(countries);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   const getCountryData = async (country) => {
-    const response = await fetch(`${url}/${country}`);
-    const [data] = await response.json();
-    const { area, capital, population } = data;
-    setCountryArea(area);
-    setCountryCapital(capital);
-    setCountryPopulation(population);
+    try {
+      const response = await fetch(`${urlName}/${country}`);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} country data not found`);
+      }
+      const data = await response.json();
+      const { area, capital, population } = data?.[0];
+      setCountryArea(area);
+      setCountryCapital(capital);
+      setCountryPopulation(population);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const getCountryFlag = async (country) => {
-    const response = await fetch(`${url2}/${country}`);
-    setCountryFlag(response.url);
-    setCountryVisible(true);
+    try {
+      const response = await fetch(`${urlFlag}/${country}`);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} flag not found`);
+      }
+      setCountryFlag(response.url);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const formSubmit = (event) => {
     event.preventDefault();
+    if (!allCountries.includes(searchQuery.toLowerCase())) {
+      alert("Sorry, we do not currently have data on this country!");
+      return;
+    }
     getCountryData(searchQuery);
     getCountryFlag(searchQuery);
+    setCountryVisible(true);
   };
 
   const onSearchChange = (event) => {
