@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.scss";
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [countryVisible, setCountryVisible] = useState(false);
   const [countryArea, setCountryArea] = useState([]);
   const [countryCapital, setCountryCapital] = useState([]);
   const [countryFlag, setCountryFlag] = useState([]);
@@ -12,11 +13,6 @@ const App = () => {
   const url2 = "https://countryflagsapi.com/png";
 
   const backgroundImg = `${process.env.PUBLIC_URL}/images/image.png`;
-
-  useEffect(() => {
-    getCountryData(searchQuery);
-    getCountryFlag(searchQuery);
-  }, [searchQuery]);
 
   const getCountryData = async (country) => {
     const response = await fetch(`${url}/${country}`);
@@ -30,6 +26,13 @@ const App = () => {
   const getCountryFlag = async (country) => {
     const response = await fetch(`${url2}/${country}`);
     setCountryFlag(response.url);
+    setCountryVisible(true);
+  };
+
+  const formSubmit = (event) => {
+    event.preventDefault();
+    getCountryData(searchQuery);
+    getCountryFlag(searchQuery);
   };
 
   const onSearchChange = (event) => {
@@ -45,23 +48,40 @@ const App = () => {
       <div className="title-container">
         <h1 className="title">Country Database</h1>
       </div>
-      <input
-        className="search-countries"
-        type="search"
-        placeholder="Search countries"
-        onChange={onSearchChange}
-      ></input>
-      <div className="country-container">
+      <form className="search-form" onSubmit={formSubmit}>
+        <input
+          className="search-countries"
+          type="text"
+          value={searchQuery}
+          onChange={onSearchChange}
+          placeholder="Enter a country"
+        />
+        <button className="search-btn" type="submit">
+          Search
+        </button>
+      </form>
+      <div className={`country-container ${countryVisible ? "" : "hidden"}`}>
         <img
           className="flag-img"
           src={countryFlag}
           alt={`${searchQuery} flag`}
         />
         <div className="country-details-container">
-          <h2>Country: {searchQuery}</h2>
-          <h2>Capital: {countryCapital}</h2>
-          <h2>Population: {countryPopulation}</h2>
-          <h2>Area: {countryArea} km²</h2>
+          <h2>
+            Capital: <span className="detail-text">{countryCapital}</span>
+          </h2>
+          <h2>
+            Population:{" "}
+            <span className="detail-text">
+              {countryPopulation.toLocaleString(navigator.language)}
+            </span>
+          </h2>
+          <h2>
+            Area:{" "}
+            <span className="detail-text">
+              {countryArea.toLocaleString(navigator.language)} km²
+            </span>
+          </h2>
         </div>
       </div>
     </div>
