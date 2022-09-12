@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import "./App.scss";
 
+import Form from "./components/form/form.component";
+import Flag from "./components/card/flag/flag.component";
+import Details from "./components/card/details/details.component";
+
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allCountries, setAllCountries] = useState([]);
@@ -65,7 +69,7 @@ const App = () => {
     }
   };
 
-  const formSubmit = (event) => {
+  const onFormSubmit = (event) => {
     event.preventDefault();
     if (!allCountries.includes(searchQuery.toLowerCase())) {
       alert("Sorry, we do not currently have data on this country!");
@@ -88,41 +92,22 @@ const App = () => {
       <div className="title-container">
         <h1 className="title">Country Database</h1>
       </div>
-      <form className="search-form" onSubmit={formSubmit}>
-        <input
-          className="search-countries"
-          type="text"
-          value={searchQuery}
-          onChange={onSearchChange}
-          placeholder="Enter a country"
-        />
-        <button className="search-btn" type="submit">
-          Search
-        </button>
-      </form>
+      <Form
+        formSubmitHandler={onFormSubmit}
+        inputValue={searchQuery}
+        inputOnChangeHandler={onSearchChange}
+      />
       <div className={`country-container ${countryVisible ? "" : "hidden"}`}>
-        <img
+        <Flag
           className="flag-img"
-          src={countryFlag}
-          alt={`${searchQuery} flag`}
+          imgSrc={countryFlag}
+          altText={`${searchQuery} flag`}
         />
-        <div className="country-details-container">
-          <h2>
-            Capital: <span className="detail-text">{countryCapital}</span>
-          </h2>
-          <h2>
-            Population:{" "}
-            <span className="detail-text">
-              {countryPopulation.toLocaleString(navigator.language)}
-            </span>
-          </h2>
-          <h2>
-            Area:{" "}
-            <span className="detail-text">
-              {countryArea.toLocaleString(navigator.language)} km²
-            </span>
-          </h2>
-        </div>
+        <Details
+          capital={countryCapital}
+          population={countryPopulation}
+          area={countryArea}
+        />
       </div>
     </div>
   );
